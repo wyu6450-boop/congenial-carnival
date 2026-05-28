@@ -1,7 +1,7 @@
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
-# documentation.
+documentation.
 
 # APIsec addresses the critical need to secure APIs before they reach production.
 # APIsec provides the industry’s only automated and continuous API testing platform that uncovers security vulnerabilities and logic flaws in APIs.
@@ -29,8 +29,6 @@ name: APIsec
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  # Customize trigger events based on your DevSecOps processes.
   push:
     branches: [ "main" ]
   pull_request:
@@ -38,9 +36,7 @@ on:
   schedule:
     - cron: '17 9 * * 2'
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
 
 permissions:
   contents: read
@@ -49,23 +45,23 @@ jobs:
 
   Trigger_APIsec_scan:
     permissions:
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+      security-events: write
+      actions: read
     runs-on: ubuntu-latest
 
     steps:
+       - name: Checkout code
+         uses: actions/checkout@v3
+
        - name: APIsec scan
          uses: apisec-inc/apisec-run-scan@025432089674a28ba8fb55f8ab06c10215e772ea
          with:
-          # The APIsec username with which the scans will be executed
-          apisec-username: ${{ secrets.apisec_username }}
-          # The Password of the APIsec user with which the scans will be executed
-          apisec-password: ${{ secrets.apisec_password}}
-          # The name of the project for security scan
-          apisec-project: "VAmPI"
-          # The name of the sarif format result file The file is written only if this property is provided.
-          sarif-result-file: "apisec-results.sarif"
+           apisec-username: ${{ secrets.apisec_username }}
+           apisec-password: ${{ secrets.apisec_password }}
+           apisec-project: "VAmPI"
+           sarif-result-file: "apisec-results.sarif"
+
        - name: Import results
          uses: github/codeql-action/upload-sarif@v3
          with:
-          sarif_file: ./apisec-results.sarif
+           sarif_file: ./apisec-results.sarif
